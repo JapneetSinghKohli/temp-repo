@@ -3,18 +3,7 @@ import { motion } from 'framer-motion';
 import { Play, BookOpen, Clock, HelpCircle } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
-
-interface LectureContentType {
-  id: string;
-  lecture_id: string;
-  topic: string;
-  definition: string | null;
-  recording_url: string | null;
-  book_reference: string | null;
-  content_data: ContentSection[] | string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { LectureContent as LectureContentType, ContentData, Animation as AnimationType } from '../types';
 
 interface ContentSection {
   topic?: string;
@@ -23,14 +12,14 @@ interface ContentSection {
   content?: string;
   answer?: string;
   question?: string;
-  animations?: Animation[];
+  animations?: AnimationSection[];
   book_references?: string[];
 }
 
-interface Animation {
+interface AnimationSection {
   title: string;
   code?: string;
-  video?: string;
+  video?: string | null;
   duration?: string;
 }
 
@@ -63,8 +52,27 @@ export function LectureContent({ content }: LectureContentProps) {
       raw = JSON.parse(raw);
       if (typeof raw === 'string') raw = JSON.parse(raw);
     }
-    if (Array.isArray(raw)) contentData = raw;
-    else if (raw && typeof raw === 'object') {
+    if (Array.isArray(raw)) {
+      // Check if it's ContentData[] format (from types) or ContentSection[] format
+      if (raw.length > 0 && 'topic' in raw[0] && 'details' in raw[0] && 'animations' in raw[0]) {
+        // It's ContentData[] format, convert to ContentSection[]
+        contentData = raw.map((item: ContentData) => ({
+          topic: item.topic,
+          details: item.details,
+          question: item.question,
+          animations: item.animations.map((anim: AnimationType) => ({
+            title: anim.title,
+            code: anim.code,
+            video: anim.video,
+            duration: anim.duration,
+          })),
+          book_references: item.book_references,
+        }));
+      } else {
+        // It's already ContentSection[] format
+        contentData = raw;
+      }
+    } else if (raw && typeof raw === 'object') {
       if (Array.isArray((raw as any).content)) contentData = (raw as any).content;
       else if (Array.isArray((raw as any).sections)) contentData = (raw as any).sections;
       else if (Array.isArray((raw as any).doubts)) contentData = (raw as any).doubts;
@@ -166,10 +174,10 @@ export function LectureContent({ content }: LectureContentProps) {
                 )}
 
                 {/* Animations - Only show if video exists */}
-                {section.animations && section.animations.filter(anim => anim.video).length > 0 && (
+                {section.animations && section.animations.filter(anim => anim.video && anim.video !== null).length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     {section.animations
-                      .filter(anim => anim.video)
+                      .filter(anim => anim.video && anim.video !== null)
                       .map((anim, aidx) => (
                         <Card
                           key={aidx}

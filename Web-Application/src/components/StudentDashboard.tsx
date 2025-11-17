@@ -242,7 +242,7 @@ export function StudentDashboard({ onLogout }: StudentDashboardProps) {
 
           {/* Chat panel (only on desktop) */}
           <div className="hidden lg:block w-[350px] border-l border-gray-200">
-            <ChatPanel lectureContent={getCurrentContent()?.content as unknown} />
+            <ChatPanel lectureContent={getCurrentContent() as unknown} />
           </div>
         </div>
       </div>
@@ -274,7 +274,7 @@ export function StudentDashboard({ onLogout }: StudentDashboardProps) {
       <QnAGenerator 
         open={qnaDialogOpen} 
         onClose={() => setQnaDialogOpen(false)} 
-        lectureContent={getCurrentContent()?.content as unknown} 
+        lectureContent={getCurrentContent() as unknown} 
       />
 
       {/* Student Doubts Dialog/Page */}

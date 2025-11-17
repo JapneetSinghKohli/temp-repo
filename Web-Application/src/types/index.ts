@@ -87,6 +87,8 @@ export interface LectureContent {
   recording_url: string;
   book_reference: string;
   content_data: ContentData[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 /* ------------------ UPDATED SECTION ENDS HERE ------------------ */

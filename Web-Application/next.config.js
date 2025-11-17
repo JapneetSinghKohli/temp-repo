@@ -14,7 +14,14 @@ const nextConfig = {
   },
   images: {
     domains: [],
+    remotePatterns: [],
   },
+  // Optimize for production
+  // Uncomment the line below for Docker/standalone deployments
+  // output: 'standalone',
+  poweredByHeader: false,
+  compress: true,
+  reactStrictMode: true,
 }
 
 module.exports = nextConfig
